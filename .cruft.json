@@ -1,0 +1,17 @@
+{
+  "template": "https://github.com/ecmwf-projects/cookiecutter-conda-package",
+  "commit": "e65c19079314a8d4a8579fc1f2a5262ecfa102db",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "cads-toolbox",
+      "project_slug": "cads_toolbox",
+      "project_short_description": "CADS Toolbox library",
+      "copyright_holder": "European Union",
+      "copyright_year": "2022",
+      "mypy_strict": "True",
+      "_template": "https://github.com/ecmwf-projects/cookiecutter-conda-package"
+    }
+  },
+  "directory": null
+}
