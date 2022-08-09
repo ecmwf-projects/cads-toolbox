@@ -17,7 +17,7 @@ After activating the conda environment:
 
 ```
 cd cads-toolbox
-make conda-dev-update
+make conda-env-update
 make git-clone-all
 make pip-install-all
 pre-commit install
