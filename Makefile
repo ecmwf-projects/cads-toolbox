@@ -30,3 +30,31 @@ docs-build:
 	cd docs && rm -fr _api && make clean && make html
 
 # DO NOT EDIT ABOVE THIS LINE, ADD COMMANDS BELOW
+
+REPOSITORIES := \
+	../cacholote \
+	../cads-api-client \
+	../cgul \
+	../teal
+
+# the commands below are executed once to setup the development environment,
+# repositories are cloned into sibling folders
+
+git-clone-all: $(REPOSITORIES)
+
+../cacholote:
+	git clone git@github.com:bopen/cacholote.git $@
+
+../%:
+	git clone git@github.com:ecmwf-projects/$*.git $@
+
+pip-install-all: $(REPOSITORIES)
+	@for repo in $^; do	\
+		pip install --no-deps -e $(CURDIR)/$$repo; \
+	done;
+	pip install --no-deps -e $(CURDIR)
+
+git-pull-all: $(REPOSITORIES)
+	@for repo in $^; do	\
+		git -C $(CURDIR)/$$repo pull; \
+	done;

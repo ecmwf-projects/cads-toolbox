@@ -11,6 +11,15 @@ conda create -n DEVELOP -c conda-forge python=3.10
 conda activate DEVELOP
 ```
 
+## Setup the development environment
+
+After activating the conda environment:
+
+```
+make git-clone-all
+make pip-install-all
+```
+
 Before pushing to GitHub, run the following commands:
 
 1. Update conda environment: `make conda-env-update`
