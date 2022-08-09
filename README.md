@@ -2,10 +2,10 @@
 
 CADS Toolbox library provides a entry point to the CADS data and software
 
-
 ## Usage
 
 ### import the package
+
 ```python
 >>> import cadstoolbox as cads
 ```
@@ -17,6 +17,7 @@ CADS Toolbox library provides a entry point to the CADS data and software
 ```
 
 ### Request some data and download to a local location
+
 ```python
 >>> request = [
 ...    "reanalysis-era5-single-levels",
@@ -35,6 +36,7 @@ CADS Toolbox library provides a entry point to the CADS data and software
 ```
 
 ### Request some data and explore polymorphism and caching
+
 ```python
 >>> remote = cads.catalogue.retrieve(*request)
 >>> dataset = remote.to_xarray() # Involves download to your local cache disk (cacholote) and harmonisation of data coordinates and unit names (cgul)
@@ -47,6 +49,7 @@ Data variables:
 ```
 
 ### Request some data, open as an xarray dataset and plot using xarray methods
+
 ```python
 >>> remote = cads.catalogue.retrieve(*request)
 >>> dataset = remote.to_xarray()
@@ -66,9 +69,8 @@ Data variables:
 >>> plt.show()
 ```
 
-
-
 ### Use the CADS toolbox service to execute large compute jobs on the CADS infrastructure
+
 ```python
 >>> remote = cads.catalogue.retrieve(*request)
 >>> climatology = cads.climatology(remote, **kwargs)
@@ -76,7 +78,6 @@ Data variables:
 >>> # OR downloaded directly:
 >>> climatology.download(‘./my_climatology.nc’)
 ```
-
 
 ## Workflow for developers/contributors
 
