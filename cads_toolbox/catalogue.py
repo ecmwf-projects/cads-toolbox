@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import cdsapi
 
@@ -24,14 +24,13 @@ def collection(collection_id: str) -> Dict[str, Any]:
 
 
 class Remote:
-    def __init__(self, cdsapi_result: cdsapi.api.Result):
-        self.cdsapi_result = cdsapi_result
+    def __init__(self, collection_id: str, request: Dict[str, Any]) -> None:
+        self.client = cdsapi.Client()
+        self.result = self.client.retrieve(collection_id, request)
 
-    def download(self, target=None) -> None:
-        self.cdsapi_result.download(target)
+    def download(self, target: Optional[str] = None) -> None:
+        self.result.download(target)
 
 
 def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
-    client = cdsapi.Client()
-    result = client.retrieve(collection_id, request)
-    return Remote(result)
+    return Remote(collection_id, request)
