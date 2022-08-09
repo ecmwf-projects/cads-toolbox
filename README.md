@@ -35,6 +35,7 @@ CADS Toolbox library provides a entry point to the CADS data and software
 >>> remote = cads.catalogue.retrieve(*request)
 >>> remote.download() # Uses filename on server for downloaded result
 >>> remote.download(target='./test.ext') # Saves result in ./test.ext
+
 ```
 
 ### Request some data and explore polymorphism and caching
