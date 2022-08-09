@@ -31,6 +31,9 @@ docs-build:
 
 # DO NOT EDIT ABOVE THIS LINE, ADD COMMANDS BELOW
 
+doc-tests:
+	python -m pytest -vv --cov=. --cov-report=$(COV_REPORT) --doctest-glob="*.md" README.md
+
 REPOSITORIES := \
 	../cacholote \
 	../cads-api-client \
