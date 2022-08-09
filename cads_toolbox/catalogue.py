@@ -24,11 +24,14 @@ def collection(collection_id: str) -> Dict[str, Any]:
 
 
 class Remote:
-    def __init__(self, cdsapi_remote: cdsapi.Client):
-        self.cdsapi_remote = cdsapi_remote
+    def __init__(self, cdsapi_result: cdsapi.api.Result):
+        self.cdsapi_result = cdsapi_result
+
+    def download(self, target=None) -> None:
+        self.cdsapi_result.download(target)
 
 
 def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
     client = cdsapi.Client()
-    remote = client.retrieve(collection_id, request)
-    return Remote(remote)
+    result = client.retrieve(collection_id, request)
+    return Remote(result)
