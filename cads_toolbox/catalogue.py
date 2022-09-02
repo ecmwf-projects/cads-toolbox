@@ -69,3 +69,7 @@ class Remote:
         import teal
 
         return teal.open(self.cached_file_path)
+
+
+def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
+    return Remote(collection_id, request)
