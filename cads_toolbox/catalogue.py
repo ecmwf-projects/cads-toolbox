@@ -77,5 +77,5 @@ class Remote:
         return cdsapi.Client().retrieve(self.collection_id, self.request)
 
 
-def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
-    return Remote(collection_id, request)
+def retrieve(collection_id: str, request: Dict[str, Any], cache: bool = True) -> Remote:
+    return Remote(collection_id, request, cache)
