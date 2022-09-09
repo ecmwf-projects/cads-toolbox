@@ -15,9 +15,7 @@
 # limitations under the License.
 
 import functools
-import io
-import shutil
-import tempfile
+import os
 from typing import Any, Dict, Optional
 
 import cacholote
@@ -29,14 +27,14 @@ def collection(collection_id: str) -> Dict[str, Any]:
 
 
 @cacholote.cacheable
-def download_to_cache(collection_id: str, request: Dict[str, Any]) -> io.BufferedReader:
-    # TODO: add extension to file
-    target = tempfile.NamedTemporaryFile().name
-    cdsapi.Client().retrieve(collection_id, request, target)
-    io_json = cacholote.extra_encoders.dictify_io_object(
-        open(target, "rb"), delete_original=True
-    )
-    return open(io_json["file:local_path"], "rb")
+def download_to_cache(collection_id: str, request: Dict[str, Any]):
+    c = cdsapi.Client()
+    r = c.retrieve(collection_id, request)
+    dirfs = cacholote.config.get_cache_files_dirfs()
+    target = r.location.rsplit("/", 1)[-1]
+    with dirfs.open(target, "wb") as f:
+        r.download(f)
+    return dirfs.open(target, "rb")
 
 
 class Remote:
@@ -45,30 +43,38 @@ class Remote:
     ) -> None:
         self.collection_id = collection_id
         self.request = request
+        self.cache = cache
 
-    @property
-    def cached_file_path(self) -> str:
-        f = download_to_cache(self.collection_id, self.request)
-        return f.name
+    def download(
+        self, target: Optional[str] = None, cache: Optional[bool] = None
+    ) -> str:
+        if cache is None:
+            cache = self.cache
 
-    def download(self, target: Optional[str] = None, cache: bool = True) -> None:
+        if not cache:
+            return self.retrieve.download(target)
 
-        if cache:
-            if target is None:
-                # TODO: How to get the default target used by cdsapi?
-                raise ValueError("not implemented yet")
-            shutil.copyfile(self.cached_file_path, target)
-        else:
-            cdsapi.Client().retrieve(self.collection_id, self.request, target)
+        cached_file_path = download_to_cache(self.collection_id, self.request).path
+        if target is None:
+            return cached_file_path
+
+        dirfs = cacholote.config.get_cache_files_dirfs()
+        cached_basename = os.path.basename(cached_file_path)
+        dirfs.get_file(cached_basename, target)
+        return target
 
     def to_xarray(self, *args, **kwargs):
         return self.teal.to_xarray(*args, **kwargs)
 
-    @functools.cached_property
+    @property
     def teal(self):
         import teal
 
-        return teal.open(self.cached_file_path)
+        return teal.open(self.download())
+
+    @functools.cached_property
+    def retrieve(self):
+        return cdsapi.Client().retrieve(self.collection_id, self.request)
 
 
 def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
