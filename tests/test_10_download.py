@@ -5,6 +5,8 @@ import pytest
 
 import cads_toolbox
 
+cads_toolbox.config.USE_CACHE = True
+
 
 @pytest.fixture
 def request_args():

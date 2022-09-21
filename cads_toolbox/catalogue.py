@@ -14,57 +14,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import functools
-import os
-from typing import Any, Dict, Optional
+import dataclasses
+from typing import Any, Dict
 
 import cacholote
 import cdsapi
+import fsspec
+
+from . import config
 
 
 def collection(collection_id: str) -> Dict[str, Any]:
     return {"id": collection_id}
 
 
-@cacholote.cacheable
-def download_to_cache(collection_id: str, request: Dict[str, Any]):
-    c = cdsapi.Client()
-    r = c.retrieve(collection_id, request)
-    dirfs = cacholote.config.get_cache_files_dirfs()
-    target = r.location.rsplit("/", 1)[-1]
-    with dirfs.open(target, "wb") as f:
-        r.download(f)
-    return dirfs.open(target, "rb")
+def _download(collection_id, request, target=None):
+    client = cdsapi.Client()
+    path = client.retrieve(collection_id, request).download(target)
+    return fsspec.open(path, "rb").open()
 
 
+@dataclasses.dataclass
 class Remote:
-    def __init__(
-        self, collection_id: str, request: Dict[str, Any], cache: bool = True
-    ) -> None:
-        self.collection_id = collection_id
-        self.request = request
-        self.cache = cache
+    collection_id: str
+    request: Dict[str, Any]
 
-    def download(
-        self, target: Optional[str] = None, cache: Optional[bool] = None
-    ) -> str:
-        if cache is None:
-            cache = self.cache
-
-        if not cache:
-            return self.retrieve.download(target)
-
-        cached_file_path = download_to_cache(self.collection_id, self.request).path
-        if target is None:
-            return cached_file_path
-
-        dirfs = cacholote.config.get_cache_files_dirfs()
-        cached_basename = os.path.basename(cached_file_path)
-        dirfs.get_file(cached_basename, target)
-        return target
-
-    def to_xarray(self, *args, **kwargs):
-        return self.teal.to_xarray(*args, **kwargs)
+    def download(self, target=None):
+        if config.USE_CACHE:
+            obj = cacholote.cacheable(_download)(self.collection_id, self.request)
+            if target:
+                obj.fs.get(obj.path, target)
+                return target
+        else:
+            obj = _download(self.collection_id, self.request, target)
+        return obj.path
 
     @property
     def teal(self):
@@ -72,10 +55,14 @@ class Remote:
 
         return teal.open(self.download())
 
-    @functools.cached_property
-    def retrieve(self):
-        return cdsapi.Client().retrieve(self.collection_id, self.request)
+    @property
+    def to_xarray(self):
+        return self.teal.to_xarray
+
+    @property
+    def to_pandas(self):
+        return self.teal.to_pandas
 
 
-def retrieve(collection_id: str, request: Dict[str, Any], cache: bool = True) -> Remote:
-    return Remote(collection_id, request, cache)
+def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
+    return Remote(collection_id, request)
