@@ -12,6 +12,7 @@ dependencies:
 - sphinx
 - sphinx-autoapi
     # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
+- cdsapi
 - cf-units
 - click
 - dask
@@ -20,7 +21,4 @@ dependencies:
 - h5netcdf
 - netCDF4
 - pandas
-- pip
-- xarray>=2022.6.0
-- pip:
-  - git+https://github.com/bopen/cdsapi.git@file_obj
+- xarray
