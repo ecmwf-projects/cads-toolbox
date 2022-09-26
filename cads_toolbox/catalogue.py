@@ -41,7 +41,8 @@ class Remote:
 
     def download(self, target=None):
         if config.USE_CACHE:
-            obj = cacholote.cacheable(_download)(self.collection_id, self.request)
+            with cacholote.config.set(io_delete_original=True):
+                obj = cacholote.cacheable(_download)(self.collection_id, self.request)
             if target:
                 obj.fs.get(obj.path, target)
                 return target
