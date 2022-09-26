@@ -15,9 +15,14 @@
 # limitations under the License.
 
 import functools
+import logging
+import time
 from typing import Any, Dict, Optional
 
 import cdsapi
+import teal
+
+logger = logging.getLogger(__name__)
 
 
 def collection(collection_id: str) -> Dict[str, Any]:
@@ -26,11 +31,38 @@ def collection(collection_id: str) -> Dict[str, Any]:
 
 class Remote:
     def __init__(
-        self, collection_id: str, request: Dict[str, Any], cache: bool = True
+        self,
+        collection_id: str,
+        request: Dict[str, Any],
+        cache: bool = True,
+        wait_on_result=True,
     ) -> None:
         self.client = cdsapi.Client()
         self.result = self.client.retrieve(collection_id, request)
         self.cache_path = None
+        if wait_on_result:
+            self.wait_on_result()
+
+    def wait_on_result(self) -> None:
+        # TODO: make it work
+        sleep = 1.0
+        last_status = self.status
+        while True:
+            status = self.status
+            if last_status != status:
+                logger.info(f"status changed to {status}")
+            if status == "successful":
+                break
+            elif status == "failed":
+                raise RuntimeError()
+            elif status in ("accepted", "running"):
+                sleep *= 1.5
+                if sleep > self.sleep_max:
+                    sleep = self.sleep_max
+            else:
+                raise RuntimeError(f"Unknown API state {status!r}")
+            logger.debug(f"waiting for {sleep} seconds")
+            time.sleep(sleep)
 
     def download(self, target: Optional[str] = None, cache: bool = True) -> None:
         # FIXE: manage cache == False
@@ -38,15 +70,18 @@ class Remote:
         # copy(self.cache_path, target)
 
     def download_to_cache(self) -> None:
+        # FIXME: check if the file is in the cache
+        self.wait_on_result()
         self.result.download(self.cache_path)
 
-    def to_xarray(self, *args, **kwargs):
-        return self.teal.to_xarray(*args, **kwargs)
+    def __getattr__(self, name: str) -> Any:
+        # FIXME: do we want to keep it?
+        if not name.startswith("_"):
+            return getattr(self.data, name)
 
     @functools.cached_property
-    def teal(self):
-        import teal
-
+    def data(self):
+        self.download()
         return teal.open(self.cache_path)
 
 
