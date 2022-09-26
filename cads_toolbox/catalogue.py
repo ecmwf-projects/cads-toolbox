@@ -45,10 +45,9 @@ class Remote:
                 obj = cacholote.cacheable(_download)(self.collection_id, self.request)
             if target:
                 obj.fs.get(obj.path, target)
-                return target
         else:
             obj = _download(self.collection_id, self.request, target)
-        return obj.path
+        return target or obj.path
 
     @property
     def teal(self):
