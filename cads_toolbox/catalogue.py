@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dataclasses
 from typing import Any, Dict, Optional, Union
 
 import cacholote
@@ -35,7 +34,6 @@ def _download(
     return fsspec.open(path, "rb").open()
 
 
-@dataclasses.dataclass
 class Remote:
     def __init__(self, collection_id: str, request: Dict[str, Any]):
         self.collection_id = collection_id
