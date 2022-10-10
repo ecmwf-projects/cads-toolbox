@@ -12,13 +12,6 @@ CADS Toolbox library provides a entry point to the CADS data and software
 
 ```
 
-### Explore CADS catalogue
-
-```python
->>> collection = cads_toolbox.catalogue.collection("reanalysis-era5-single-levels")  # see cads_api_client API demo
-
-```
-
 ### Request some data and download to a local location
 
 ```python
@@ -36,8 +29,8 @@ CADS Toolbox library provides a entry point to the CADS data and software
 >>> remote = cads_toolbox.catalogue.retrieve(*request)
 >>> remote.download() # Uses filename on server for downloaded result
 '...'
->>> remote.download(target='./test.ext') # Saves result in ./test.ext
-'./test.ext'
+>>> remote.download(target='./test.grib') # Saves result in ./test.ext
+'./test.grib'
 
 ```
 

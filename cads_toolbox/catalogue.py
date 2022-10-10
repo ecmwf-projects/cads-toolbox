@@ -24,10 +24,6 @@ import fsspec
 from . import config
 
 
-def collection(collection_id: str) -> Dict[str, Any]:
-    return {"id": collection_id}
-
-
 def _download(collection_id, request, target=None):
     client = cdsapi.Client()
     path = client.retrieve(collection_id, request).download(target)
