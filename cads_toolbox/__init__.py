@@ -1,4 +1,4 @@
-"""CADS Toolbox library."""
+"""CADS Toolbox library provides an entry point to the CADS data and software."""
 
 # Copyright 2022, European Union.
 #
