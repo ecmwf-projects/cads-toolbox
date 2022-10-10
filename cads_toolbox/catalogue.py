@@ -15,16 +15,21 @@
 # limitations under the License.
 
 import dataclasses
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import cacholote
 import cdsapi
 import fsspec
+import pandas as pd
+import teal
+import xarray as xr
 
 from . import config
 
 
-def _download(collection_id, request, target=None):
+def _download(
+    collection_id: str, request: Dict[str, Any], target: Optional[str] = None
+):
     client = cdsapi.Client()
     path = client.retrieve(collection_id, request).download(target)
     return fsspec.open(path, "rb").open()
@@ -35,7 +40,7 @@ class Remote:
     collection_id: str
     request: Dict[str, Any]
 
-    def download(self, target=None):
+    def download(self, target: Optional[str] = None) -> str:
         if config.USE_CACHE:
             with cacholote.config.set(io_delete_original=True):
                 obj = cacholote.cacheable(_download)(self.collection_id, self.request)
@@ -46,17 +51,15 @@ class Remote:
         return target or obj.path
 
     @property
-    def data(self):
-        import teal
-
+    def data(self) -> teal.Data:
         return teal.open(self.download())
 
     @property
-    def to_xarray(self):
+    def to_xarray(self) -> xr.Dataset:
         return self.data.to_xarray
 
     @property
-    def to_pandas(self):
+    def to_pandas(self) -> pd.DataFrame:
         return self.data.to_pandas
 
 

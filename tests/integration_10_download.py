@@ -23,7 +23,7 @@ def request_args():
     ]
 
 
-def test_cached_download(tmpdir, request_args):
+def test_cached_download(tmpdir, request_args) -> None:
     remote = cads_toolbox.catalogue.retrieve(*request_args)
     with cacholote.config.set(cache_store_directory=tmpdir):
         # Download to cache
