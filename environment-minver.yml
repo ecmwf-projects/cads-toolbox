@@ -8,6 +8,7 @@ dependencies:
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
 - cdsapi
 - fsspec
+- numpy
 - pip
 - pip:
   - git+https://github.com/bopen/cacholote.git
