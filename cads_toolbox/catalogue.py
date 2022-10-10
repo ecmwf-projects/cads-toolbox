@@ -46,18 +46,18 @@ class Remote:
         return target or obj.path
 
     @property
-    def teal(self):
+    def data(self):
         import teal
 
         return teal.open(self.download())
 
     @property
     def to_xarray(self):
-        return self.teal.to_xarray
+        return self.data.to_xarray
 
     @property
     def to_pandas(self):
-        return self.teal.to_pandas
+        return self.data.to_pandas
 
 
 def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
