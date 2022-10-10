@@ -3,7 +3,7 @@ CONDA := conda
 CONDAFLAGS :=
 COV_REPORT := html
 
-default: qa unit-tests type-check
+default: qa unit-tests integration-tests type-check
 
 qa:
 	pre-commit run --all-files
@@ -33,4 +33,4 @@ docs-build:
 
 integration-tests:
 	python -m pytest -vv --cov=. --cov-report=$(COV_REPORT) tests/integration*.py
-	python -m pytest -vv --doctest-glob='*.md' README.md
+	python -m pytest -vv --doctest-glob='*.md'

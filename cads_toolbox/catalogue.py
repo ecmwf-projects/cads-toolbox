@@ -15,21 +15,21 @@
 # limitations under the License.
 
 import dataclasses
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 import cacholote
 import cdsapi
 import fsspec
-import pandas as pd
 import teal
-import xarray as xr
 
 from . import config
 
 
 def _download(
     collection_id: str, request: Dict[str, Any], target: Optional[str] = None
-):
+) -> Union[
+    fsspec.spec.AbstractBufferedFile, fsspec.implementations.local.LocalFileOpener
+]:
     client = cdsapi.Client()
     path = client.retrieve(collection_id, request).download(target)
     return fsspec.open(path, "rb").open()
@@ -37,10 +37,23 @@ def _download(
 
 @dataclasses.dataclass
 class Remote:
-    collection_id: str
-    request: Dict[str, Any]
+    def __init__(self, collection_id: str, request: Dict[str, Any]):
+        self.collection_id = collection_id
+        self.request = request
 
     def download(self, target: Optional[str] = None) -> str:
+        """
+        Download file with data.
+
+        Parameters
+        ----------
+        target: str, optional
+        Path to which to save data.
+
+        Returns
+        -------
+        str: Path to which data are saved.
+        """
         if config.USE_CACHE:
             with cacholote.config.set(io_delete_original=True):
                 obj = cacholote.cacheable(_download)(self.collection_id, self.request)
@@ -52,14 +65,15 @@ class Remote:
 
     @property
     def data(self) -> teal.Data:
+        """Object representing the requested data."""
         return teal.open(self.download())
 
     @property
-    def to_xarray(self) -> xr.Dataset:
+    def to_xarray(self) -> Any:
         return self.data.to_xarray
 
     @property
-    def to_pandas(self) -> pd.DataFrame:
+    def to_pandas(self) -> Any:
         return self.data.to_pandas
 
 

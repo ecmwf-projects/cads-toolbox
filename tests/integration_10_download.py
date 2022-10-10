@@ -1,4 +1,6 @@
 import os
+import pathlib
+from typing import Any, Dict, Tuple
 
 import cacholote
 import pytest
@@ -9,8 +11,8 @@ cads_toolbox.config.USE_CACHE = True
 
 
 @pytest.fixture
-def request_args():
-    return [
+def request_args() -> Tuple[str, Dict[str, Any]]:
+    return (
         "reanalysis-era5-single-levels",
         {
             "variable": "2m_temperature",
@@ -20,10 +22,12 @@ def request_args():
             "day": "01",
             "time": "12:00",
         },
-    ]
+    )
 
 
-def test_cached_download(tmpdir, request_args) -> None:
+def test_cached_download(
+    tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
+) -> None:
     remote = cads_toolbox.catalogue.retrieve(*request_args)
     with cacholote.config.set(cache_store_directory=tmpdir):
         # Download to cache

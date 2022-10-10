@@ -1,8 +1,8 @@
 # cads-toolbox
 
-CADS Toolbox library provides a entry point to the CADS data and software
+CADS Toolbox library
 
-## Usage
+## Quick Start
 
 ### import the package
 
@@ -57,21 +57,20 @@ Dimensions:  ...
 >>> dataarray = dataset.to_array()  # Use xarray methods to manipulate the object
 >>> dataarray
 <xarray.DataArray ...
->>> _ = dataarray.isel(time=0).plot()
->>> import matplotlib.pyplot as plt
->>> plt.show()
+>>> dataarray.isel(time=0).plot()
+<matplotlib.collections.QuadMesh object ...
 
 ```
 
-### Use the CADS toolbox service to execute large compute jobs on the CADS infrastructure
+### NOT YET IMPLEMENTED: Use the CADS toolbox service to execute large compute jobs on the CADS infrastructure
 
 ```python
->>> remote = cads_toolbox.catalogue.retrieve(*request)
->>> climatology = cads_toolbox.climatology(remote, **kwargs)
->>> climatology_ds = climatology.to_xarray()
+>>> remote = cads_toolbox.catalogue.retrieve(*request)  # doctest: +SKIP
+>>> climatology = cads_toolbox.climatology(remote, **kwargs)  # doctest: +SKIP
+>>> climatology_ds = climatology.to_xarray()  # doctest: +SKIP
 >>> # OR downloaded directly:
->>> climatology.download("./my_climatology.nc")
-'./my_climatology.nc'
+>>> climatology.download("./my_climatology.nc")  # doctest: +SKIP
+'./my_climatology.nc'  # doctest: +SKIP
 
 ```
 
@@ -82,18 +81,6 @@ For best experience create a new conda environment (e.g. DEVELOP) with Python 3.
 ```
 conda create -n DEVELOP -c conda-forge python=3.10
 conda activate DEVELOP
-```
-
-## Setup the development environment
-
-After activating the conda environment:
-
-```
-cd cads-toolbox
-make conda-env-update
-make git-clone-all
-make pip-install-all
-pre-commit install
 ```
 
 Before pushing to GitHub, run the following commands:
