@@ -9,6 +9,7 @@ dependencies:
 - cdsapi
 - fsspec
 - numpy
+- six
 - pip
 - pip:
   - git+https://github.com/bopen/cacholote.git
