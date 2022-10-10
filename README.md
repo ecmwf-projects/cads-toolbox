@@ -7,14 +7,15 @@ CADS Toolbox library provides a entry point to the CADS data and software
 ### import the package
 
 ```python
->>> import cads_toolbox as cads
+>>> import cads_toolbox
+>>> cads_toolbox.config.USE_CACHE = True  # opt-in to use the cache globally
 
 ```
 
 ### Explore CADS catalogue
 
 ```python
->>> collection = cads.catalogue.collection("reanalysis-era5-single-levels")  # see cads_api_client API demo
+>>> collection = cads_toolbox.catalogue.collection("reanalysis-era5-single-levels")  # see cads_api_client API demo
 
 ```
 
@@ -32,54 +33,53 @@ CADS Toolbox library provides a entry point to the CADS data and software
 ...        'time': '12:00',
 ...    }
 ... ]
->>> remote = cads.catalogue.retrieve(*request)
+>>> remote = cads_toolbox.catalogue.retrieve(*request)
 >>> remote.download() # Uses filename on server for downloaded result
+'...'
 >>> remote.download(target='./test.ext') # Saves result in ./test.ext
+'./test.ext'
 
 ```
 
 ### Request some data and explore polymorphism and caching
 
 ```python
->>> remote = cads.catalogue.retrieve(*request)
+>>> remote = cads_toolbox.catalogue.retrieve(*request)
 >>> dataset = remote.to_xarray() # Involves download to your local cache disk (cacholote) and harmonisation of data coordinates and unit names (cgul)
 >>> dataset
 <xarray.Dataset>
-Dimensions:  ()
-Data variables:
-    *empty*
+Dimensions:  ...
 >>> dataframe = remote.to_pandas() # Uses cached interim result from to_xarray so re-download is not required.
+
 ```
 
 ### Request some data, open as an xarray dataset and plot using xarray methods
 
 ```python
->>> remote = cads.catalogue.retrieve(*request)
+>>> remote = cads_toolbox.catalogue.retrieve(*request)
 >>> dataset = remote.to_xarray()
 >>> dataset
 <xarray.Dataset>
-Dimensions:  ()
-Data variables:
-    *empty*
+Dimensions:  ...
 >>> dataarray = dataset.to_array()  # Use xarray methods to manipulate the object
 >>> dataarray
-<xarray.DataArray>
-Dimensions:  ()
-Data variables:
-    *empty*
->>> dataarray.isel(time=0).plot()
+<xarray.DataArray ...
+>>> _ = dataarray.isel(time=0).plot()
 >>> import matplotlib.pyplot as plt
 >>> plt.show()
+
 ```
 
 ### Use the CADS toolbox service to execute large compute jobs on the CADS infrastructure
 
 ```python
->>> remote = cads.catalogue.retrieve(*request)
->>> climatology = cads.climatology(remote, **kwargs)
+>>> remote = cads_toolbox.catalogue.retrieve(*request)
+>>> climatology = cads_toolbox.climatology(remote, **kwargs)
 >>> climatology_ds = climatology.to_xarray()
 >>> # OR downloaded directly:
->>> climatology.download(‘./my_climatology.nc’)
+>>> climatology.download("./my_climatology.nc")
+'./my_climatology.nc'
+
 ```
 
 ## Workflow for developers/contributors
