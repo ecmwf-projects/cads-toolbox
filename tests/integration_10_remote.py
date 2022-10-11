@@ -29,20 +29,17 @@ def test_uncached_download(
     cads_toolbox.config.USE_CACHE = False
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
+    target = str(tmpdir / "test.grib")
 
     # Download
-    filename = remote.download()
-    assert filename.startswith(os.path.abspath(".")) and filename.endswith(".grib")
-    assert os.path.getsize(filename) == 2076600
+    assert remote.download(target) == target
+    assert os.path.getsize(target) == 2076600
 
     # Re-download
-    previous_mtime = os.path.getmtime(filename)
-    assert remote.download() == filename
-    assert os.path.getmtime(filename) != previous_mtime
-    assert os.path.getsize(filename) == 2076600
-
-    # Cleanup
-    os.remove(filename)
+    previous_mtime = os.path.getmtime(target)
+    assert remote.download(target) == target
+    assert os.path.getmtime(target) != previous_mtime
+    assert os.path.getsize(target) == 2076600
 
 
 def test_cached_download(
@@ -58,15 +55,15 @@ def test_cached_download(
         assert os.path.dirname(cache_file) == tmpdir
 
         # Use cached file
-        expected_mtime = os.path.getmtime(cache_file)
+        previous_mtime = os.path.getmtime(cache_file)
         assert remote.download() == cache_file
-        assert os.path.getmtime(cache_file) == expected_mtime
+        assert os.path.getmtime(cache_file) == previous_mtime
 
         # Copy from cache file
         target = str(tmpdir / "test.grib")
         assert remote.download(target=target) == target
         assert os.path.getsize(target) == 2076600
-        assert os.path.getmtime(cache_file) == expected_mtime
+        assert os.path.getmtime(cache_file) == previous_mtime
 
 
 def test_to_xarray(
