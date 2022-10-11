@@ -5,9 +5,13 @@ dependencies:
 - make
 - pytest
 - pytest-cov
-    # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
+# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
 - cdsapi
-- cf-units
-- click
-- diskcache
-- geopandas
+- fsspec
+- numpy
+- six
+- pip
+- pip:
+  - git+https://github.com/bopen/cacholote.git
+  - git+https://github.com/ecmwf-projects/cgul.git
+  - git+https://github.com/ecmwf-projects/teal.git

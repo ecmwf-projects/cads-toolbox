@@ -1,4 +1,4 @@
-"""CADS Toolbox library."""
+"""CADS Toolbox library provides an entry point to the CADS data and software."""
 
 # Copyright 2022, European Union.
 #
@@ -22,4 +22,6 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
-__all__ = ["__version__"]
+from . import catalogue
+
+__all__ = ["__version__", "catalogue"]

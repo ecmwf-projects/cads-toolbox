@@ -101,13 +101,15 @@ jobs:
     strategy:
       matrix:
         include:
-        - python-version: '3.10'
-          extra: -minver
+        - extra: -minver
+          python-version: '3.10'
+        - extra: ''
+          python-version: '3.8'
 
     steps:
     - uses: actions/checkout@v3
     - name: Install Conda environment with Micromamba
-      uses: mamba-org/provision-with-micromamba@v12
+      uses: mamba-org/provision-with-micromamba@v13
       with:
         environment-file: environment${{ matrix.extra }}.yml
         environment-name: DEVELOP${{ matrix.extra }}

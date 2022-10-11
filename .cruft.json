@@ -6,7 +6,7 @@
     "cookiecutter": {
       "project_name": "cads-toolbox",
       "project_slug": "cads_toolbox",
-      "project_short_description": "CADS Toolbox library",
+      "project_short_description": "CADS Toolbox library provides an entry point to the CADS data and software",
       "copyright_holder": "European Union",
       "copyright_year": "2022",
       "mypy_strict": "True",
