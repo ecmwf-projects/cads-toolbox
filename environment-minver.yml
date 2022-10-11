@@ -11,7 +11,7 @@ dependencies:
 - numpy
 - six
 - pip
-- cgul
 - pip:
+  - cgul
   - git+https://github.com/bopen/cacholote.git
   - git+https://github.com/ecmwf-projects/teal.git
