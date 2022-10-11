@@ -46,7 +46,7 @@ class Remote:
         Parameters
         ----------
         target: str, optional
-        Path to which to save data.
+            Path to which to save data.
 
         Returns
         -------
@@ -76,4 +76,18 @@ class Remote:
 
 
 def retrieve(collection_id: str, request: Dict[str, Any]) -> Remote:
+    """
+    Retrieve CADS data.
+
+    Parameters
+    ----------
+    collection_id: str
+        ID of the dataset.
+    request: dict
+        Parameters of the request.
+
+    Returns
+    -------
+    Remote: Object with various methods to access CADS data.
+    """
     return Remote(collection_id, request)
