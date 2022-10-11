@@ -1,6 +1,6 @@
 # Welcome to cads_toolbox's documentation!
 
-CADS Toolbox library.
+CADS Toolbox library provides an entry point to the CADS data and software.
 
 ```{toctree}
 :caption: 'Contents:'

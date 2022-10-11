@@ -1,3 +1,7 @@
+# downloaded files
+*.grib
+*.nc
+
 # setuptools-scm
 version.py
 
