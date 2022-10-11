@@ -3,16 +3,13 @@ CONDA := conda
 CONDAFLAGS :=
 COV_REPORT := html
 
-default: qa unit-tests type-check
+default: qa unit-tests
 
 qa:
 	pre-commit run --all-files
 
 unit-tests:
 	python -m pytest -vv --cov=. --cov-report=$(COV_REPORT)
-
-type-check:
-	python -m mypy .
 
 conda-env-update:
 	$(CONDA) env update $(CONDAFLAGS) -f environment.yml
