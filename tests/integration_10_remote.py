@@ -23,29 +23,23 @@ def request_args() -> Tuple[str, Dict[str, Any]]:
     )
 
 
-def test_uncached_download(request_args: Tuple[str, Dict[str, Any]]) -> None:
+def test_uncached_download(
+    tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
+) -> None:
     cads_toolbox.config.USE_CACHE = False
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
 
     # Download
     filename = remote.download()
-    dirname, basename = os.path.split(filename)
-    assert dirname == os.path.abspath(".")
-    assert basename.startswith("adaptor.mars.internal") and basename.endswith(".grib")
+    assert filename.startswith(os.path.abspath(".")) and filename.endswith(".grib")
     assert os.path.getsize(filename) == 2076600
 
     # Re-download
     previous_mtime = os.path.getmtime(filename)
-    new_filename = remote.download()
-    assert filename == new_filename
+    assert remote.download() == filename
     assert os.path.getmtime(filename) != previous_mtime
-
-    # Download using target
-    previous_mtime = os.path.getmtime(filename)
-    new_filename = remote.download(filename)
-    assert filename == new_filename
-    assert os.path.getmtime(filename) != previous_mtime
+    assert os.path.getsize(filename) == 2076600
 
     # Cleanup
     os.remove(filename)
