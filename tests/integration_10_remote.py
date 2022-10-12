@@ -25,7 +25,7 @@ def request_args() -> Tuple[str, Dict[str, Any]]:
 
 def test_uncached_download(
     tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
-) -> None:
+):
     cads_toolbox.config.USE_CACHE = False
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
@@ -44,7 +44,7 @@ def test_uncached_download(
 
 def test_cached_download(
     tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
-) -> None:
+):
     cads_toolbox.config.USE_CACHE = True
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
@@ -66,9 +66,7 @@ def test_cached_download(
         assert os.path.getmtime(cache_file) == previous_mtime
 
 
-def test_to_xarray(
-    tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
-) -> None:
+def test_to_xarray(tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
     xr = pytest.importorskip("xarray")
 
     cads_toolbox.config.USE_CACHE = True
@@ -77,9 +75,7 @@ def test_to_xarray(
         assert isinstance(remote.to_xarray(), xr.Dataset)
 
 
-def test_to_pandas(
-    tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
-) -> None:
+def test_to_pandas(tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
     pd = pytest.importorskip("pandas")
 
     cads_toolbox.config.USE_CACHE = True

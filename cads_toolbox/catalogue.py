@@ -67,11 +67,11 @@ class Remote:
         return teal.open(self.download())
 
     @property
-    def to_xarray(self) -> Any:
+    def to_xarray(self):
         return self.data.to_xarray
 
     @property
-    def to_pandas(self) -> Any:
+    def to_pandas(self):
         return self.data.to_pandas
 
 
