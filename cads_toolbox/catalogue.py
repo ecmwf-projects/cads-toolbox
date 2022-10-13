@@ -31,7 +31,8 @@ def _download(
 ]:
     client = cdsapi.Client()
     path = client.retrieve(collection_id, request).download(target)
-    return fsspec.open(path, "rb").open()
+    with fsspec.open(path, "rb") as f:
+        return f
 
 
 class Remote:
