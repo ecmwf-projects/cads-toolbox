@@ -1,3 +1,5 @@
+# THIS PACKAGE IS IN A BETA STAGE OF DEVELOPMENT AND IS NOT SUPPORTED PUBLICALLY
+
 # cads-toolbox
 
 CADS Toolbox library provides an entry point to the CADS data and software
