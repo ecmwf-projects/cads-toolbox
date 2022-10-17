@@ -1,5 +1,5 @@
-# THIS PACKAGE IS IN AN ALPHA STAGE OF DEVELOPMENT AND IS NOT SUPPORTED PUBLICLY
-
+# DISCLAIMER:
+## This project is BETA and will be Experimental for the forseable time. Interfaces and functionality are likely to change. DO NOT use this software in any project/software that is operational.
 # cads-toolbox
 
 CADS Toolbox library provides an entry point to the CADS data and software
