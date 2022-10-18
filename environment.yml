@@ -26,5 +26,5 @@ dependencies:
 - pip
 - pip:
   - cgul
-  - git+https://github.com/bopen/cacholote.git
+  - cacholote
   - git+https://github.com/ecmwf-projects/teal.git
