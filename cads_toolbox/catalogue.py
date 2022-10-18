@@ -18,8 +18,8 @@ from typing import Any, Dict, Optional, Union
 
 import cacholote
 import cdsapi
-import fsspec
 import emohawk
+import fsspec
 
 from . import config
 
