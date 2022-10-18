@@ -13,5 +13,5 @@ dependencies:
 - pip
 - pip:
   - cgul
+  - emohawk
   - cacholote
-  - git+https://github.com/ecmwf-projects/teal.git
