@@ -27,4 +27,4 @@ dependencies:
 - pip:
   - cgul
   - emohawk
-  - git+https://github.com/bopen/cacholote.git
+  - cacholote

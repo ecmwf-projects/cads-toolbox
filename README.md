@@ -1,6 +1,6 @@
 # DISCLAIMER:
 
-## This project is BETA and will be Experimental for the forseable time. Interfaces and functionality are likely to change. DO NOT use this software in any project/software that is operational.
+## This project is ALPHA and will be Experimental for the forseable time. Interfaces and functionality are likely to change. DO NOT use this software in any project/software that is operational.
 
 # cads-toolbox
 
