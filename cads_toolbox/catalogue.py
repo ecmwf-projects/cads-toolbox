@@ -19,7 +19,7 @@ from typing import Any, Dict, Optional, Union
 import cacholote
 import cdsapi
 import fsspec
-import teal
+import emohawk
 
 from . import config
 
@@ -63,9 +63,9 @@ class Remote:
         return target or obj.path
 
     @property
-    def data(self) -> teal.Data:
+    def data(self) -> emohawk.Data:
         """Object representing the requested data."""
-        return teal.open(self.download())
+        return emohawk.open(self.download())
 
     @property
     def to_xarray(self):
