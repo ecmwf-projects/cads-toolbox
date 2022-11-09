@@ -8,8 +8,6 @@ dependencies:
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
 - cdsapi
 - fsspec
-- numpy
-- six
 - pip
 - pip:
   - cgul

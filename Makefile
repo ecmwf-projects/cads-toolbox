@@ -3,13 +3,13 @@ CONDA := conda
 CONDAFLAGS :=
 COV_REPORT := html
 
-default: qa integration-tests type-check
+default: qa unit-tests type-check
 
 qa:
 	pre-commit run --all-files
 
 unit-tests:
-	python -m pytest -vv --cov=. --cov-report=$(COV_REPORT)
+	python -m pytest -vv --cov=. --cov-report=$(COV_REPORT) --doctest-glob="*.md" --doctest-glob="*.rst"
 
 type-check:
 	python -m mypy .
@@ -30,7 +30,3 @@ docs-build:
 	cd docs && rm -fr _api && make clean && make html
 
 # DO NOT EDIT ABOVE THIS LINE, ADD COMMANDS BELOW
-
-integration-tests:
-	python -m pytest -vv --cov=. --cov-report=$(COV_REPORT) tests/integration*.py
-	python -m pytest -vv --doctest-glob='*.md'

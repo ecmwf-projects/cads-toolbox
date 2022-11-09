@@ -2,7 +2,6 @@ import os
 import pathlib
 from typing import Any, Dict, Tuple
 
-import cacholote
 import pytest
 
 import cads_toolbox
@@ -24,12 +23,12 @@ def request_args() -> Tuple[str, Dict[str, Any]]:
 
 
 def test_uncached_download(
-    tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
+    tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
 ):
     cads_toolbox.config.USE_CACHE = False
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
-    target = str(tmpdir / "test.grib")
+    target = str(tmp_path / "test.grib")
 
     # Download
     assert remote.download(target) == target
@@ -43,42 +42,39 @@ def test_uncached_download(
 
 
 def test_cached_download(
-    tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
+    tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]
 ):
     cads_toolbox.config.USE_CACHE = True
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
-    with cacholote.config.set(cache_store_directory=tmpdir):
-        # Download to cache
-        cache_file = remote.download()
-        assert os.path.getsize(cache_file) == 2076600
-        assert os.path.dirname(cache_file) == tmpdir
+    # Download to cache
+    cache_file = remote.download()
+    assert os.path.getsize(cache_file) == 2076600
+    assert os.path.dirname(cache_file) == str(tmp_path / "cache_files")
 
-        # Use cached file
-        previous_mtime = os.path.getmtime(cache_file)
-        assert remote.download() == cache_file
-        assert os.path.getmtime(cache_file) == previous_mtime
+    # Use cached file
+    previous_mtime = os.path.getmtime(cache_file)
+    assert remote.download() == cache_file
+    assert os.path.getmtime(cache_file) == previous_mtime
 
-        # Copy from cache file
-        target = str(tmpdir / "test.grib")
-        assert remote.download(target=target) == target
-        assert os.path.getsize(target) == 2076600
-        assert os.path.getmtime(cache_file) == previous_mtime
+    # Copy from cache file
+    target = str(tmp_path / "test.grib")
+    assert remote.download(target=target) == target
+    assert os.path.getsize(target) == 2076600
+    assert os.path.getmtime(cache_file) == previous_mtime
 
 
-def test_to_xarray(tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
+def test_to_xarray(tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
     xr = pytest.importorskip("xarray")
 
     cads_toolbox.config.USE_CACHE = True
     remote = cads_toolbox.catalogue.retrieve(*request_args)
-    with cacholote.config.set(cache_store_directory=tmpdir):
-        assert isinstance(remote.to_xarray(), xr.Dataset)
+    assert isinstance(remote.to_xarray(), xr.Dataset)
 
 
-def test_to_pandas(tmpdir: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
+def test_to_pandas(tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
     pd = pytest.importorskip("pandas")
 
     cads_toolbox.config.USE_CACHE = True
     remote = cads_toolbox.catalogue.retrieve(*request_args)
-    with cacholote.config.set(cache_store_directory=tmpdir):
-        assert isinstance(remote.to_pandas(), pd.DataFrame)
+    assert isinstance(remote.to_pandas(), pd.DataFrame)
