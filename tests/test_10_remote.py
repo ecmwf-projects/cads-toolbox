@@ -65,6 +65,7 @@ def test_cached_download(
 
 
 def test_to_xarray(tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
+    pytest.importorskip("cfgrib")
     xr = pytest.importorskip("xarray")
 
     cads_toolbox.config.USE_CACHE = True
@@ -73,6 +74,7 @@ def test_to_xarray(tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, An
 
 
 def test_to_pandas(tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
+    pytest.importorskip("cfgrib")
     pd = pytest.importorskip("pandas")
 
     cads_toolbox.config.USE_CACHE = True
