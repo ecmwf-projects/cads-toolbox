@@ -1,4 +1,3 @@
-import os
 import pathlib
 from typing import Any, Dict, Tuple
 
@@ -28,17 +27,17 @@ def test_uncached_download(
     cads_toolbox.config.USE_CACHE = False
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
-    target = str(tmp_path / "test.grib")
+    target = tmp_path / "test.grib"
 
     # Download
     assert remote.download(target) == target
-    assert os.path.getsize(target) == 2076600
+    assert target.stat().st_size == 2076600
 
     # Re-download
-    previous_mtime = os.path.getmtime(target)
+    previous_mtime = target.stat().st_mtime
     assert remote.download(target) == target
-    assert os.path.getmtime(target) != previous_mtime
-    assert os.path.getsize(target) == 2076600
+    assert target.stat().st_mtime != previous_mtime
+    assert target.stat().st_size == 2076600
 
 
 def test_cached_download(
@@ -48,20 +47,20 @@ def test_cached_download(
 
     remote = cads_toolbox.catalogue.retrieve(*request_args)
     # Download to cache
-    cache_file = remote.download()
-    assert os.path.getsize(cache_file) == 2076600
-    assert os.path.dirname(cache_file) == str(tmp_path / "cache_files")
+    cache_file = pathlib.Path(remote.download())
+    assert cache_file.stat().st_size == 2076600
+    assert cache_file.parent == tmp_path / "cache_files"
 
     # Use cached file
-    previous_mtime = os.path.getmtime(cache_file)
-    assert remote.download() == cache_file
-    assert os.path.getmtime(cache_file) == previous_mtime
+    previous_mtime = cache_file.stat().st_mtime
+    assert remote.download() == str(cache_file)
+    assert cache_file.stat().st_mtime == previous_mtime
 
     # Copy from cache file
-    target = str(tmp_path / "test.grib")
-    assert remote.download(target=target) == target
-    assert os.path.getsize(target) == 2076600
-    assert os.path.getmtime(cache_file) == previous_mtime
+    target = tmp_path / "test.grib"
+    assert remote.download(target) == target
+    assert target.stat().st_size == 2076600
+    assert cache_file.stat().st_mtime == previous_mtime
 
 
 def test_to_xarray(tmp_path: pathlib.Path, request_args: Tuple[str, Dict[str, Any]]):
