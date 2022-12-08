@@ -11,7 +11,7 @@ UNION_TYPES = [T.Union, types.UnionType]
 EMPTY_TYPES = [inspect._empty]
 DEFAULT_KWARG_TYPES = {
     "dataarray": xr.DataArray,
-    "dataset": xr.DataSet,
+    "dataset": xr.Dataset,
     "data": np.ndarray,
 }
 
@@ -26,11 +26,10 @@ def cadsify_module(module, decorator):
 def cadsify_function(function, **kwarg_types):
     kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
     signature = inspect.signature(function)
+    mapping = cadsify_mapping(signature, kwarg_types)
 
     @wraps(function)
     def wrapper(*args, **kwargs):
-        mapping = cadsify_mapping(signature, kwarg_types)
-
         # add args to kwargs
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
