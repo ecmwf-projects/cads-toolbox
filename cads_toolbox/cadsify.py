@@ -23,21 +23,6 @@ def cadsify_module(module, decorator):
             setattr(module, name, decorator(func))
 
 
-def cadsify_function_ecp(function, **_non_standard_mapping):
-    def wrapper(*args, **kwargs):
-        mapping = cadsify_mapping(function, _non_standard_mapping)
-        new_kwargs = {}
-        for arg, name in zip(args, inspect.signature(function).parameters):
-            if name in mapping:
-                new_kwargs[name] = emohawk.transform(arg, mapping[name])
-            else:
-                new_kwargs[name] = arg
-        for name in kwargs:
-            if name in mapping:
-                new_kwargs[name] = emohawk.transform(kwargs[name], mapping[name])
-            else:
-                new_kwargs[name] = kwargs[name]
-
 def cadsify_function(function, **kwarg_types):
     kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
     signature = inspect.signature(function)
@@ -50,9 +35,9 @@ def cadsify_function(function, **kwarg_types):
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
 
-        # transform kwargs
+        # transform kwargs if necessary
         for key, value in [(k,v) for k,v in kwargs.items() if k in mapping]:
-            kwarg_types = mapping[key]
+            kwarg_types = ensure_iterable(mapping[key])
             for kwarg_type in kwarg_types:
                 if kwarg_type is type(value):
                     break
@@ -73,12 +58,18 @@ def cadsify_mapping(signature, kwarg_types):
             if T.get_origin(annotation) in UNION_TYPES:
                 kwarg_type = T.get_args(annotation)
             else:
-                kwarg_type = (annotation)
+                kwarg_type = annotation
         elif key in kwarg_types:
             # 2. Check for specifically assigned format
-            kwarg_type = (kwarg_types.get(key))
+            kwarg_type = kwarg_types.get(key)
         else:
             # 3. Do nothing, cannot assign None, as None is a valid type
             continue
         mapping[key] = kwarg_type
     return mapping
+
+
+def ensure_iterable(input_item):
+    if not any([isinstance(input_item, _type) for _type in [tuple, list, dict, iter]]):
+        return [input_item]
+    return input_item
