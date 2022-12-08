@@ -17,23 +17,6 @@ STANDARD_MAPPING = {
     'data': np.ndarray,
 }
 
-def cadsify_function(function, **non_standard_formats):
-    # Wrapper to ensure inputs to function are appropriate for the
-    # function.
-    # Tasks:
-    #  ensure docstrings are imported
-    #  data objects correct format
-    #  args+kwargs correctly parsed.
-
-    @wraps(function)
-    def _function(*args, **kwargs):
-        for arg in args:
-            arg
-        function(*args, **kwargs)
-
-    return _function
-
-
 
 def cadsify_module(module, decorator):
     for name in dir(module):
@@ -44,7 +27,7 @@ def cadsify_module(module, decorator):
 
 def cadsify_function(function, **_non_standard_mapping):
     def wrapper(*args, **kwargs):
-        mapping = cadsify_mapping(function, _non_standard_mapping, *args, **kwargs)
+        mapping = cadsify_mapping(function, _non_standard_mapping)
         new_kwargs = {}
         for arg, name in zip(args, inspect.signature(function).parameters):
             if name in mapping:
@@ -62,7 +45,7 @@ def cadsify_function(function, **_non_standard_mapping):
 
 
 
-def cadsify_mapping(function, _non_standard_mapping, *args, **kwargs):
+def cadsify_mapping(function, _non_standard_mapping):
     mapping = {}
     signature = inspect.signature(function)
     for thing in signature.parameters:
