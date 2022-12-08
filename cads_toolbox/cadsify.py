@@ -44,16 +44,21 @@ def cadsify_function(function, **kwarg_types):
     return wrapper
 
 
-def cadsify_mapping(signature, kwarg_types, *args, **kwargs):
+def cadsify_mapping(signature, kwarg_types):
     mapping = {}
     for key, parameter in signature.parameters.items():
         annotation = parameter.annotation
         if annotation not in EMPTY_TYPES:
+            # 1. Use type setting from function
             if T.get_origin(annotation) in UNION_TYPES:
                 kwarg_type = T.get_args(annotation)
             else:
                 kwarg_type = annotation
-        else:
+        elif key in kwarg_types:
+            # 2. Check for specifically assigned format
             kwarg_type = kwarg_types.get(key)
+        else:
+            # 3. Do nothing, cannot assign None, as None is a valid type
+            continue
         mapping[key] = kwarg_type
     return mapping
