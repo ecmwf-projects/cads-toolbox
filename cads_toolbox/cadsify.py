@@ -24,25 +24,26 @@ def cadsify_module(module, decorator):
 
 
 def cadsify_function(function, **kwarg_types):
-    kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
-    signature = inspect.signature(function)
-    mapping = cadsify_mapping(signature, kwarg_types)
-
-    @wraps(function)
+    @wraps(function, kwarg_types)
     def wrapper(*args, **kwargs):
+        kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
+        signature = inspect.signature(function)
+        mapping = cadsify_mapping(signature, kwarg_types)
+
         # add args to kwargs
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
-
+        print(mapping)
         # transform kwargs if necessary
         for key, value in [(k,v) for k,v in kwargs.items() if k in mapping]:
+            print(key, value)
             kwarg_types = ensure_iterable(mapping[key])
             for kwarg_type in kwarg_types:
                 if kwarg_type is type(value):
                     break
             else:
                 kwargs[key] = emohawk.transform(value, kwarg_types[0])
-
+        print('HELLO', kwargs)
         return function(**kwargs)
 
     return wrapper
@@ -52,6 +53,7 @@ def cadsify_mapping(signature, kwarg_types):
     mapping = {}
     for key, parameter in signature.parameters.items():
         annotation = parameter.annotation
+        print(key, parameter, annotation)
         if annotation not in EMPTY_TYPES:
             # 1. Use type setting from function
             if T.get_origin(annotation) in UNION_TYPES:
