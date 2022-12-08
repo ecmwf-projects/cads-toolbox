@@ -1,38 +1,19 @@
-from functools import wraps
-import types
 import inspect
+import types
 import typing as T
+from functools import wraps
+
+import emohawk
 import numpy as np
 import xarray as xr
 
-import emohawk
-
 UNION_TYPES = [T.Union, types.UnionType]
 EMPTY_TYPES = [inspect._empty]
-
-
-STANDARD_MAPPING = {
-    'dataarray': xr.DataArray,
-    'dataset': xr.DataSet,
-    'data': np.ndarray,
+DEFAULT_KWARG_TYPES = {
+    "dataarray": xr.DataArray,
+    "dataset": xr.DataSet,
+    "data": np.ndarray,
 }
-
-def cadsify_function(function, **non_standard_formats):
-    # Wrapper to ensure inputs to function are appropriate for the
-    # function.
-    # Tasks:
-    #  ensure docstrings are imported
-    #  data objects correct format
-    #  args+kwargs correctly parsed.
-
-    @wraps(function)
-    def _function(*args, **kwargs):
-        for arg in args:
-            arg
-        function(*args, **kwargs)
-
-    return _function
-
 
 
 def cadsify_module(module, decorator):
@@ -42,50 +23,37 @@ def cadsify_module(module, decorator):
             setattr(module, name, decorator(func))
 
 
-def cadsify_function(function, **_non_standard_mapping):
-    def wrapper(*args, **kwargs):
-        mapping = cadsify_mapping(function, _non_standard_mapping, *args, **kwargs)
-        new_kwargs = {}
-        for arg, name in zip(args, inspect.signature(function).parameters):
-            if name in mapping:
-                new_kwargs[name] = emohawk.transform(arg, mapping[name])
-            else:
-                new_kwargs[name] = arg
-        for name in kwargs:
-            if name in mapping:
-                new_kwargs[name] = emohawk.transform(kwargs[name], mapping[name])
-            else:
-                new_kwargs[name] = kwargs[name]
+def cadsify_function(function, **kwarg_types):
+    kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
+    signature = inspect.signature(function)
 
-        return function(**new_kwargs)
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        mapping = cadsify_mapping(signature, kwarg_types, *args, **kwargs)
+
+        for arg, name in zip(args, signature.parameters):
+            kwargs[name] = arg
+
+        for key, value in kwargs.items():
+            kwarg_type = mapping[key]
+            if kwarg_type is not None:
+                kwargs[key] = emohawk.transform(value, kwarg_type)
+
+        return function(**kwargs)
+
     return wrapper
 
 
-
-def cadsify_mapping(function, _non_standard_mapping, *args, **kwargs):
+def cadsify_mapping(signature, kwarg_types, *args, **kwargs):
     mapping = {}
-    signature = inspect.signature(function)
-    for thing in signature.parameters:
-        annotation = signature.parameters[thing].annotation
-        if thing in _non_standard_mapping:
-            # 1. Check if cads-toolbox specifically assigns a required format
-            required_format = _non_standard_mapping[thing]
-        elif annotation not in EMPTY_TYPES:
-            # 2. Use type setting
+    for key, parameter in signature.parameters.items():
+        annotation = parameter.annotation
+        if annotation not in EMPTY_TYPES:
             if T.get_origin(annotation) in UNION_TYPES:
-                required_format = T.get_args(annotation)
+                kwarg_type = T.get_args(annotation)
             else:
-                required_format = annotation
-        elif thing in STANDARD_MAPPING:
-            # 3. Use standard signature mapping
-            required_format = STANDARD_MAPPING[thing]
+                kwarg_type = annotation
         else:
-            # 4. Do nothing
-            continue
-        mapping[thing] = required_format
-    
+            kwarg_type = kwarg_types.get(key)
+        mapping[key] = kwarg_type
     return mapping
-
-
-
-    
