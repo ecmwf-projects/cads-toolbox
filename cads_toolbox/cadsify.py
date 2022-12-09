@@ -7,6 +7,8 @@ import emohawk
 import numpy as np
 import xarray as xr
 
+from cads_toolbox.catalogue import Remote
+
 UNION_TYPES = [T.Union, types.UnionType]
 EMPTY_TYPES = [inspect._empty]
 DEFAULT_KWARG_TYPES = {
@@ -14,6 +16,12 @@ DEFAULT_KWARG_TYPES = {
     "dataset": xr.Dataset,
     "data": np.ndarray,
 }
+
+
+def transform(thing, kwarg_type):
+    if type(thing) == Remote:
+        thing = thing.data
+    return emohawk.transform(thing, kwarg_type)
 
 
 def cadsify_module(module, decorator):
@@ -26,8 +34,6 @@ def cadsify_module(module, decorator):
 def cadsify_function(function, **kwarg_types):
 
     def _wrapper(kwarg_types, *args, **kwargs):
-        print(args)
-        print(kwargs)
         kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
         signature = inspect.signature(function)
         mapping = cadsify_mapping(signature, kwarg_types)
@@ -35,17 +41,14 @@ def cadsify_function(function, **kwarg_types):
         # add args to kwargs
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
-        print(mapping)
         # transform kwargs if necessary
         for key, value in [(k,v) for k,v in kwargs.items() if k in mapping]:
-            print(key, value)
             kwarg_types = ensure_iterable(mapping[key])
             for kwarg_type in kwarg_types:
                 if kwarg_type is type(value):
                     break
             else:
-                kwargs[key] = emohawk.transform(value, kwarg_types[0])
-        print('HELLO', kwargs)
+                kwargs[key] = transform(value, kwarg_types[0])
         return function(**kwargs)
 
     @wraps(function)
@@ -58,7 +61,6 @@ def cadsify_mapping(signature, kwarg_types):
     mapping = {}
     for key, parameter in signature.parameters.items():
         annotation = parameter.annotation
-        print(key, parameter, annotation)
         if annotation not in EMPTY_TYPES:
             # 1. Use type setting from function
             if T.get_origin(annotation) in UNION_TYPES:
@@ -76,6 +78,7 @@ def cadsify_mapping(signature, kwarg_types):
 
 
 def ensure_iterable(input_item):
-    if not any([isinstance(input_item, _type) for _type in [tuple, list, dict, iter]]):
+    if not isinstance(input_item, (tuple, list, dict)):
         return [input_item]
     return input_item
+
