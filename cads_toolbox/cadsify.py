@@ -24,8 +24,10 @@ def cadsify_module(module, decorator):
 
 
 def cadsify_function(function, **kwarg_types):
-    @wraps(function, kwarg_types)
-    def wrapper(*args, **kwargs):
+
+    def _wrapper(kwarg_types, *args, **kwargs):
+        print(args)
+        print(kwargs)
         kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
         signature = inspect.signature(function)
         mapping = cadsify_mapping(signature, kwarg_types)
@@ -46,6 +48,9 @@ def cadsify_function(function, **kwarg_types):
         print('HELLO', kwargs)
         return function(**kwargs)
 
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        return _wrapper(kwarg_types, *args, **kwargs)
     return wrapper
 
 
