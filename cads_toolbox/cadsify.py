@@ -49,11 +49,17 @@ def cadsify_function(function, **kwarg_types):
                     break
             else:
                 kwargs[key] = transform(value, kwarg_types[0])
-        return function(**kwargs)
+        result = function(**kwargs)
+        try:
+            return emohawk.open(result)
+        except:
+            # TODO: Make not bare
+            return result
 
     @wraps(function)
     def wrapper(*args, **kwargs):
         return _wrapper(kwarg_types, *args, **kwargs)
+    
     return wrapper
 
 
