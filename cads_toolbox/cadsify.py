@@ -18,43 +18,51 @@ DEFAULT_KWARG_TYPES = {
 }
 
 
+def ensure_iterable(input_item):
+    """Ensure that an item is iterable"""
+    if not isinstance(input_item, (tuple, list, dict)):
+        return [input_item]
+    return input_item
+
+
+
 def transform(thing, kwarg_type):
+    """Wrapper of emohawk.transform such that it also handles cads-toolbox Remote objects"""
     if type(thing) == Remote:
         thing = thing.data
     return emohawk.transform(thing, kwarg_type)
 
 
-def cadsify_module(module, decorator):
-    for name in dir(module):
-        func = getattr(module, name)
-        if isinstance(func, types.FunctionType):
-            setattr(module, name, decorator(func))
-
-
 def cadsify_function(function, **kwarg_types):
-
+    """
+    Cadsify a function (need a better name!). This function acts as a wrapper
+    such that emohawk will handle the input arg/kwarg format.
+    """
     def _wrapper(kwarg_types, *args, **kwargs):
         kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
         signature = inspect.signature(function)
         mapping = cadsify_mapping(signature, kwarg_types)
 
-        # add args to kwargs
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
         # transform kwargs if necessary
         for key, value in [(k,v) for k,v in kwargs.items() if k in mapping]:
             kwarg_types = ensure_iterable(mapping[key])
+            # Loop over all potential input formats and transform if necessary
             for kwarg_type in kwarg_types:
                 if kwarg_type is type(value):
                     break
             else:
-                kwargs[key] = transform(value, kwarg_types[0])
+                try:
+                    kwargs[key] = transform(value, kwarg_types[0])
+                except:
+                    # Transform was not possible, so leave item is it is and let the
+                    # function handle the rest
+                    pass
+
         result = function(**kwargs)
-        try:
-            return emohawk.open(result)
-        except:
-            # TODO: Make not bare
-            return result
+
+        return result
 
     @wraps(function)
     def wrapper(*args, **kwargs):
@@ -83,8 +91,10 @@ def cadsify_mapping(signature, kwarg_types):
     return mapping
 
 
-def ensure_iterable(input_item):
-    if not isinstance(input_item, (tuple, list, dict)):
-        return [input_item]
-    return input_item
 
+def cadsify_module(module, decorator=cadsify_function):
+    for name in dir(module):
+        func = getattr(module, name)
+        if isinstance(func, types.FunctionType):
+            setattr(module, name, decorator(func))
+    return module
