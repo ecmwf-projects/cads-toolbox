@@ -1,8 +1,8 @@
 import coucal
 
-from cads_toolbox.cadsify import cadsify_function, cadsify_module
+from cads_toolbox.inputs_transform import transform_module_inputs   #, transform_function_inputs
 
 
-aggregate = cadsify_module(coucal.aggregate, cadsify_function)
+aggregate = transform_module_inputs(coucal.aggregate)
 
-climate = cadsify_module(coucal.climate, cadsify_function)
+climate = transform_module_inputs(coucal.climate)

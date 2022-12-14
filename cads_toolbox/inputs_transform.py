@@ -33,7 +33,7 @@ def transform(thing, kwarg_type):
     return emohawk.transform(thing, kwarg_type)
 
 
-def cadsify_function(function, **kwarg_types):
+def transform_function_inputs(function, **kwarg_types):
     """
     Cadsify a function (need a better name!). This function acts as a wrapper
     such that emohawk will handle the input arg/kwarg format.
@@ -41,24 +41,24 @@ def cadsify_function(function, **kwarg_types):
     def _wrapper(kwarg_types, *args, **kwargs):
         kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
         signature = inspect.signature(function)
-        mapping = cadsify_mapping(signature, kwarg_types)
+        mapping = signature_mapping(signature, kwarg_types)
 
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
         # transform kwargs if necessary
         for key, value in [(k,v) for k,v in kwargs.items() if k in mapping]:
             kwarg_types = ensure_iterable(mapping[key])
-            # Loop over all potential input formats and transform if necessary
-            for kwarg_type in kwarg_types:
-                if kwarg_type is type(value):
+            # Transform value if necessary
+            if not type(value) in kwarg_types:
+                for kwarg_type in kwarg_types:
+                    try:
+                        kwargs[key] = transform(value, kwarg_type)
+                    except:   # TODO: Add error type
+                        # Transform was not possible, move to next kwarg type.
+                        # If no trnasform is possible, format is unchanged and we rely on function to raise 
+                        # an Error.
+                        continue
                     break
-            else:
-                try:
-                    kwargs[key] = transform(value, kwarg_types[0])
-                except:
-                    # Transform was not possible, so leave item is it is and let the
-                    # function handle the rest
-                    pass
 
         result = function(**kwargs)
 
@@ -71,7 +71,7 @@ def cadsify_function(function, **kwarg_types):
     return wrapper
 
 
-def cadsify_mapping(signature, kwarg_types):
+def signature_mapping(signature, kwarg_types):
     mapping = {}
     for key, parameter in signature.parameters.items():
         annotation = parameter.annotation
@@ -92,7 +92,7 @@ def cadsify_mapping(signature, kwarg_types):
 
 
 
-def cadsify_module(module, decorator=cadsify_function):
+def transform_module_inputs(module, decorator=transform_function_inputs):
     for name in dir(module):
         func = getattr(module, name)
         if isinstance(func, types.FunctionType):
