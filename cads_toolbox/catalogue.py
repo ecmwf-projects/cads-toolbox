@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import pathlib
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 
 import cacholote
 import cdsapi
@@ -26,7 +26,9 @@ from . import config
 
 
 def _download(
-    collection_id: str, request: Dict[str, Any], target: Optional[str] = None
+    collection_id: str,
+    request: Dict[str, Any],
+    target: Union[str, pathlib.Path, None] = None,
 ) -> Union[
     fsspec.spec.AbstractBufferedFile, fsspec.implementations.local.LocalFileOpener
 ]:
@@ -42,7 +44,7 @@ class Remote:
         self.request = request
 
     def download(
-        self, target: Optional[Union[str, pathlib.Path]] = None
+        self, target: Union[str, pathlib.Path, None] = None
     ) -> Union[str, pathlib.Path]:
         """
         Download file with data.
@@ -62,7 +64,7 @@ class Remote:
             if target:
                 obj.fs.get(obj.path, str(target))
         else:
-            obj = _download(self.collection_id, self.request, str(target))
+            obj = _download(self.collection_id, self.request, target)
         return target or obj.path
 
     @property
