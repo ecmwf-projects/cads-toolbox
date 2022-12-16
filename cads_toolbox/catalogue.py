@@ -27,7 +27,7 @@ from . import config
 
 
 def _extract_single_zip(path: str) -> str:
-    # TODO: fix upstream (emohwak)
+    # TODO: fix upstream (emohawk)
     if zipfile.is_zipfile(path):
         fs = fsspec.filesystem("zip", fo=path)
         filenames = fs.ls("")
