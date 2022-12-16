@@ -104,7 +104,7 @@ def test_to_pandas(
     assert isinstance(remote.to_pandas(), pd.DataFrame)
 
 
-def test_zipped_request_args(zipped_request_args: Tuple[str, Dict[str, Any]]):
+def test_file_zipped(zipped_request_args: Tuple[str, Dict[str, Any]]):
     cads_toolbox.config.USE_CACHE = True
     remote = cads_toolbox.catalogue.retrieve(*zipped_request_args)
     target = remote.download()
