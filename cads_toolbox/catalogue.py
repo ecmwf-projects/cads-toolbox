@@ -88,9 +88,8 @@ class Remote:
         """Object representing the requested data."""
         return emohawk.open(self.download())
 
-    @property
-    def to_xarray(self):
-        return self.data.to_xarray
+    def to_xarray(self, *args, harmonise=True, **kwargs):
+        return self.data.to_xarray(*args, harmonise=harmonise, **kwargs)
 
     @property
     def to_pandas(self):

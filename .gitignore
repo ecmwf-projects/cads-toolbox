@@ -1,3 +1,6 @@
+# Development scratch area
+.devspace/
+
 # downloaded files
 *.grib
 *.nc
