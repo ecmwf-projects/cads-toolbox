@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import pathlib
+import zipfile
 from typing import Any, Dict, Union
 
 import cacholote
@@ -23,6 +24,19 @@ import emohawk
 import fsspec
 
 from . import config
+
+
+def _extract_single_zip(path: str) -> str:
+    # TODO: fix upstream (emohawk)
+    if zipfile.is_zipfile(path):
+        fs = fsspec.filesystem("zip", fo=path)
+        filenames = fs.ls("")
+        if len(filenames) == 1:
+            filename = filenames[0]
+            fs.get(filename, filename)
+            fsspec.filesystem("file").rm(path)
+            return filename
+    return path
 
 
 def _download(
@@ -34,6 +48,8 @@ def _download(
 ]:
     client = cdsapi.Client()
     path = client.retrieve(collection_id, request).download(target)
+    if target is None:
+        path = _extract_single_zip(path)
     with fsspec.open(path, "rb") as f:
         return f
 
