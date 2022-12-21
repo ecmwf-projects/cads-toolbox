@@ -1,5 +1,4 @@
 import pathlib
-import zipfile
 from typing import Any, Dict, Tuple
 
 import pytest
@@ -18,24 +17,6 @@ def era5_request_args() -> Tuple[str, Dict[str, Any]]:
             "month": "01",
             "day": "01",
             "time": "12:00",
-        },
-    )
-
-
-@pytest.fixture
-def zipped_request_args() -> Tuple[str, Dict[str, Any]]:
-    return (
-        "insitu-gridded-observations-global-and-regional",
-        {
-            "format": "zip",
-            "origin": "gistemp",
-            "region": "global",
-            "variable": "temperature_anomaly",
-            "time_aggregation": "monthly",
-            "horizontal_aggregation": "horizontal_average",
-            "year": "1880",
-            "version": "v4.0",
-            "statistic": "mean",
         },
     )
 
@@ -102,10 +83,3 @@ def test_to_pandas(
     cads_toolbox.config.USE_CACHE = True
     remote = cads_toolbox.catalogue.retrieve(*era5_request_args)
     assert isinstance(remote.to_pandas(), pd.DataFrame)
-
-
-def test_file_zipped(zipped_request_args: Tuple[str, Dict[str, Any]]):
-    cads_toolbox.config.USE_CACHE = True
-    remote = cads_toolbox.catalogue.retrieve(*zipped_request_args)
-    target = remote.download()
-    assert zipfile.is_zipfile(target) is False
