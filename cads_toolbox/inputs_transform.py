@@ -91,7 +91,7 @@ def _signature_mapping(signature, kwarg_types):
     return mapping
 
 
-def _transform_module_inputs(module, decorator=transform_function_inputs):
+def _transform_module_inputs(module, decorator=_transform_function_inputs):
     """
     Transform the inputs to all functions in a module.
     """
