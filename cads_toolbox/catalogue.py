@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, Optional, Union
+import pathlib
+from typing import Any, Dict, Union
 
 import cacholote
 import cdsapi
@@ -25,7 +26,9 @@ from . import config
 
 
 def _download(
-    collection_id: str, request: Dict[str, Any], target: Optional[str] = None
+    collection_id: str,
+    request: Dict[str, Any],
+    target: Union[str, pathlib.Path, None] = None,
 ) -> Union[
     fsspec.spec.AbstractBufferedFile, fsspec.implementations.local.LocalFileOpener
 ]:
@@ -40,7 +43,9 @@ class Remote:
         self.collection_id = collection_id
         self.request = request
 
-    def download(self, target: Optional[str] = None) -> str:
+    def download(
+        self, target: Union[str, pathlib.Path, None] = None
+    ) -> Union[str, pathlib.Path]:
         """
         Download file with data.
 
@@ -57,7 +62,7 @@ class Remote:
             with cacholote.config.set(io_delete_original=True):
                 obj = cacholote.cacheable(_download)(self.collection_id, self.request)
             if target:
-                obj.fs.get(obj.path, target)
+                obj.fs.get(obj.path, str(target))
         else:
             obj = _download(self.collection_id, self.request, target)
         return target or obj.path
