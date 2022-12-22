@@ -13,12 +13,11 @@ import xarray as xr
 
 from cads_toolbox.catalogue import Remote
 
-UNION_TYPES = [T.Union]
 try:
-    UNION_TYPES.append(types.UnionType)
+    UNION_TYPES = [T.Union, types.UnionType]
 except AttributeError:
     # This sort of Union is not allowed in versions of python<3.9
-    pass
+    UNION_TYPES = [T.Union]
 
 EMPTY_TYPES = [inspect._empty]
 DEFAULT_KWARG_TYPES = {
