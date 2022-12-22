@@ -25,7 +25,6 @@ def ensure_iterable(input_item):
     return input_item
 
 
-
 def transform(thing, kwarg_type):
     """Wrapper of emohawk.transform such that it also handles cads-toolbox Remote objects"""
     if type(thing) == Remote:
@@ -33,29 +32,30 @@ def transform(thing, kwarg_type):
     return emohawk.transform(thing, kwarg_type)
 
 
-def transform_function_inputs(function, **kwarg_types):
+def _transform_function_inputs(function, **kwarg_types):
     """
-    Cadsify a function (need a better name!). This function acts as a wrapper
-    such that emohawk will handle the input arg/kwarg format.
+    Transform the inputs to a function to match the requirements.
+    This function acts as a wrapper such that emohawk will handle the input arg/kwarg format.
     """
+
     def _wrapper(kwarg_types, *args, **kwargs):
         kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
         signature = inspect.signature(function)
-        mapping = signature_mapping(signature, kwarg_types)
+        mapping = _signature_mapping(signature, kwarg_types)
 
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
         # transform kwargs if necessary
-        for key, value in [(k,v) for k,v in kwargs.items() if k in mapping]:
+        for key, value in [(k, v) for k, v in kwargs.items() if k in mapping]:
             kwarg_types = ensure_iterable(mapping[key])
             # Transform value if necessary
             if not type(value) in kwarg_types:
                 for kwarg_type in kwarg_types:
                     try:
                         kwargs[key] = transform(value, kwarg_type)
-                    except:   # TODO: Add error type
+                    except:  # noqa: E722   TODO: Add error type
                         # Transform was not possible, move to next kwarg type.
-                        # If no trnasform is possible, format is unchanged and we rely on function to raise 
+                        # If no trnasform is possible, format is unchanged and we rely on function to raise
                         # an Error.
                         continue
                     break
@@ -67,11 +67,11 @@ def transform_function_inputs(function, **kwarg_types):
     @wraps(function)
     def wrapper(*args, **kwargs):
         return _wrapper(kwarg_types, *args, **kwargs)
-    
+
     return wrapper
 
 
-def signature_mapping(signature, kwarg_types):
+def _signature_mapping(signature, kwarg_types):
     mapping = {}
     for key, parameter in signature.parameters.items():
         annotation = parameter.annotation
@@ -91,8 +91,10 @@ def signature_mapping(signature, kwarg_types):
     return mapping
 
 
-
-def transform_module_inputs(module, decorator=transform_function_inputs):
+def _transform_module_inputs(module, decorator=transform_function_inputs):
+    """
+    Transform the inputs to all functions in a module.
+    """
     for name in dir(module):
         func = getattr(module, name)
         if isinstance(func, types.FunctionType):

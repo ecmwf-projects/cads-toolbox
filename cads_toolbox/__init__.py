@@ -22,6 +22,6 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
-from . import catalogue, analysis
+from . import analysis, catalogue
 
 __all__ = ["__version__", "catalogue", "analysis"]

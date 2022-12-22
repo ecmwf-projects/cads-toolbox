@@ -39,7 +39,12 @@ def _download(
 
 
 class Remote:
+    """
+    CADS remote object class for handling data objects that are on the CADS/CDS cache volumes
+    """
+
     def __init__(self, collection_id: str, request: Dict[str, Any]):
+        """Initialise class"""
         self.collection_id = collection_id
         self.request = request
 
@@ -74,10 +79,12 @@ class Remote:
 
     @property
     def to_xarray(self):
+        """Convert remote object to xarray.Dataset, performs a hidden cachelotte download"""
         return self.data.to_xarray
 
     @property
     def to_pandas(self):
+        """Convert remote object to pandas.DataFrame, performs a hidden cachelotte download"""
         return self.data.to_pandas
 
 
