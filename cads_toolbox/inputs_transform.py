@@ -17,7 +17,7 @@ try:
     UNION_TYPES = [T.Union, types.UnionType]
 except AttributeError:
     # This sort of Union is not allowed in versions of python<3.9
-    UNION_TYPES = [T.Union]
+    UNION_TYPES = [T.Union,]
 
 EMPTY_TYPES = [inspect._empty]
 DEFAULT_KWARG_TYPES = {
