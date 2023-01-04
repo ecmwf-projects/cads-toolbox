@@ -14,7 +14,7 @@ AGGREGATE_METHODS = [
     "monthly_mean",
     "reduce",
     "resample",
-    "rolling_reduce"
+    "rolling_reduce",
 ]
 
 CLIMATE_METHODS = [
@@ -27,6 +27,7 @@ CLIMATE_METHODS = [
     "climatology_quantiles",
     "climatology_std",
 ]
+
 
 def test_aggregate() -> None:
     assert isinstance(cta.aggregate, ModuleType)
