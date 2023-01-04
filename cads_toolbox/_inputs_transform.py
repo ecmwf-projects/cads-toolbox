@@ -36,11 +36,11 @@ def ensure_iterable(input_item):
     return input_item
 
 
-def transform(thing, kwarg_type):
+def transform(obj, kwarg_type):
     """Wrapper of emohawk.transform such that it also handles cads-toolbox Remote objects"""
-    if type(thing) == Remote:
-        thing = thing.data
-    return emohawk.transform(thing, kwarg_type)
+    if isinstance(obj, Remote):
+        obj = obj.data
+    return emohawk.transform(obj, kwarg_type)
 
 
 def transform_function_inputs(function, **kwarg_types):
@@ -64,7 +64,7 @@ def transform_function_inputs(function, **kwarg_types):
                 for kwarg_type in kwarg_types:
                     try:
                         kwargs[key] = transform(value, kwarg_type)
-                    except:  # noqa: E722   TODO: Add error type
+                    except ValueError:
                         # Transform was not possible, move to next kwarg type.
                         # If no trnasform is possible, format is unchanged and we rely on function to raise
                         # an Error.
