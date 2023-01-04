@@ -5,8 +5,8 @@ Currently ingests the tools from the following python packages:
 """
 import coucal
 
-from cads_toolbox.inputs_transform import _transform_module_inputs
+from cads_toolbox._inputs_transform import transform_module_inputs
 
-aggregate = _transform_module_inputs(coucal.aggregate)
+aggregate = transform_module_inputs(coucal.aggregate)
 
-climate = _transform_module_inputs(coucal.climate)
+climate = transform_module_inputs(coucal.climate)

@@ -43,7 +43,7 @@ def transform(thing, kwarg_type):
     return emohawk.transform(thing, kwarg_type)
 
 
-def _transform_function_inputs(function, **kwarg_types):
+def transform_function_inputs(function, **kwarg_types):
     """
     Transform the inputs to a function to match the requirements.
     This function acts as a wrapper such that emohawk will handle the input arg/kwarg format.
@@ -52,7 +52,7 @@ def _transform_function_inputs(function, **kwarg_types):
     def _wrapper(kwarg_types, *args, **kwargs):
         kwarg_types = {**DEFAULT_KWARG_TYPES, **kwarg_types}
         signature = inspect.signature(function)
-        mapping = _signature_mapping(signature, kwarg_types)
+        mapping = signature_mapping(signature, kwarg_types)
 
         for arg, name in zip(args, signature.parameters):
             kwargs[name] = arg
@@ -82,7 +82,13 @@ def _transform_function_inputs(function, **kwarg_types):
     return wrapper
 
 
-def _signature_mapping(signature, kwarg_types):
+def signature_mapping(signature, kwarg_types):
+    """
+    Map args and kwargs to object types, using hierarchical selection method:
+    1. Type setting
+    2. Explicitly defined type
+    3. Do nothing
+    """
     mapping = {}
     for key, parameter in signature.parameters.items():
         annotation = parameter.annotation
@@ -102,7 +108,7 @@ def _signature_mapping(signature, kwarg_types):
     return mapping
 
 
-def _transform_module_inputs(module, decorator=_transform_function_inputs):
+def transform_module_inputs(module, decorator=transform_function_inputs):
     """
     Transform the inputs to all functions in a module.
     """
