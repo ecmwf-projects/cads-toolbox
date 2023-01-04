@@ -20,7 +20,7 @@ def dummy_dataarray_function(value: xr.DataArray):
 
 
 def dummy_dataframe_function(value: pd.DataFrame):
-    assert type(value) == pd.DataFrame
+    assert isinstance(value, pd.DataFrame)
 
 
 @pytest.fixture
