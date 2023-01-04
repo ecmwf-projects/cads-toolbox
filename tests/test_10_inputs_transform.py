@@ -16,7 +16,7 @@ def dummy_dataset_function(value: xr.Dataset):
 
 
 def dummy_dataarray_function(value: xr.DataArray):
-    assert type(value) == xr.DataArray
+    assert isinstance(value, xr.DataArray)
 
 
 def dummy_dataframe_function(value: pd.DataFrame):
