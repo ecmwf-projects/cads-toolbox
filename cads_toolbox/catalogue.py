@@ -79,7 +79,7 @@ class Remote:
 
     @property
     def to_xarray(self):
-        """Convert remote object to xarray.Dataset, performs a hidden cachelotte download"""
+        """Convert remote object to xarray.Dataset, performs a hidden cacholote download"""
         return self.data.to_xarray
 
     @property
