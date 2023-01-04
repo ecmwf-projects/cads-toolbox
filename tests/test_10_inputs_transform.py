@@ -56,7 +56,7 @@ def test_transform(request_args):
 
     local = remote.data
     transformed = inputs_transform.transform(local, xr.Dataset)
-    assert type(transformed) == xr.Dataset
+    assert isinstance(transformed, xr.Dataset)
 
 
 def test_transform_function_inputs():
