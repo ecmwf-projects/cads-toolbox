@@ -84,7 +84,7 @@ class Remote:
 
     @property
     def to_pandas(self):
-        """Convert remote object to pandas.DataFrame, performs a hidden cachelotte download"""
+        """Convert remote object to pandas.DataFrame, performs a hidden cacholote download"""
         return self.data.to_pandas
 
 
