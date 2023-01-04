@@ -12,7 +12,7 @@ def dummy_ndarray_function(value: np.ndarray):
 
 
 def dummy_dataset_function(value: xr.Dataset):
-    assert type(value) == xr.Dataset
+    assert isinstance(value, xr.Dataset)
 
 
 def dummy_dataarray_function(value: xr.DataArray):
