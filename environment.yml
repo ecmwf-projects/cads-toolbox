@@ -23,4 +23,5 @@ dependencies:
 - pip:
   - cgul
   - emohawk
+  - coucal
   - cacholote

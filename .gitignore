@@ -1,6 +1,10 @@
 # downloaded files
 *.grib
 *.nc
+*grib*idx
+
+# Development area
+.development_area
 
 # setuptools-scm
 version.py
