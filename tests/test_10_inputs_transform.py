@@ -8,7 +8,7 @@ from cads_toolbox import inputs_transform
 
 
 def dummy_ndarray_function(value: np.ndarray):
-    assert type(value) == np.ndarray
+    assert isinstance(value, np.ndarray)
 
 
 def dummy_dataset_function(value: xr.Dataset):
