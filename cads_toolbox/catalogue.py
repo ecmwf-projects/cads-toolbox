@@ -75,7 +75,10 @@ class Remote:
     @property
     def data(self) -> emohawk.Data:
         """Object representing the requested data."""
-        return emohawk.open(self.download())
+        return emohawk.open(
+            self.download(),
+            exclude=["*.png", "*.json"],  # TODO: implement dataset-specific kwargs
+        )
 
     @property
     def to_xarray(self):
