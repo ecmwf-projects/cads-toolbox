@@ -17,6 +17,13 @@ classifiers = [
     "Topic :: Scientific/Engineering"
 ]
 dynamic = ["version"]
+dependencies = [
+    "cacholote",
+    "cdsapi",
+    "coucal",
+    "emohawk>=0.0.3b1",
+    "fsspec"
+]
 
 [tool.coverage.run]
 branch = true
