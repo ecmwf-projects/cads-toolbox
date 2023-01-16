@@ -60,7 +60,7 @@ def transform_function_inputs(function, **kwarg_types):
         for key, value in [(k, v) for k, v in kwargs.items() if k in mapping]:
             kwarg_types = ensure_iterable(mapping[key])
             # Transform value if necessary
-            if not type(value) in kwarg_types:
+            if type(value) not in kwarg_types:
                 for kwarg_type in kwarg_types:
                     try:
                         kwargs[key] = transform(value, kwarg_type)
