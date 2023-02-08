@@ -72,7 +72,6 @@ def test_ensure_iter():
 
 
 def test_transform(request_args):
-
     ct.config.USE_CACHE = False
     remote = ct.catalogue.retrieve(*request_args)
     transformed = _inputs_transform.transform(remote, xr.Dataset)
