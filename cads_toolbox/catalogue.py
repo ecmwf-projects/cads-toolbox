@@ -46,7 +46,7 @@ class Remote:
     def __init__(self, collection_id: str, request: Dict[str, Any]):
         """Initialise class"""
         self.collection_id = collection_id
-        self.request = request
+        self.request = dict(sorted(request.items()))
 
     def download(
         self, target: Union[str, pathlib.Path, None] = None
