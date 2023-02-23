@@ -20,6 +20,7 @@ defaults:
 
 env:
   CDSAPI_URL: https://cds.climate.copernicus.eu/api/v2
+  CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
 
 jobs:
   pre-commit:
@@ -74,15 +75,6 @@ jobs:
     - name: Install package
       run: |
         python -m pip install --no-deps -e .
-    - name: Create .cdsapirc
-      env:
-        CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
-      run: |
-        echo "url: $CDSAPI_URL" > "$HOME"/.cdsapirc
-        echo "key: $CDSAPI_KEY" >> "$HOME"/.cdsapirc
-    - name: Run tests
-      run: |
-        make unit-tests COV_REPORT=xml
 
   type-check:
     needs: [combine-environments, unit-tests]
@@ -169,12 +161,6 @@ jobs:
     - name: Install package
       run: |
         python -m pip install --no-deps -e .
-    - name: Create .cdsapirc
-      env:
-        CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
-      run: |
-        echo "url: $CDSAPI_URL" > "$HOME"/.cdsapirc
-        echo "key: $CDSAPI_KEY" >> "$HOME"/.cdsapirc
     - name: Run tests
       run: |
         make unit-tests COV_REPORT=xml
