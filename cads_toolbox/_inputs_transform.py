@@ -8,25 +8,43 @@ import typing as T
 from functools import wraps
 
 import emohawk
-import numpy as np
-import xarray as xr
 
 from cads_toolbox.catalogue import Remote
+
+
+def _to_dataarray(dataset):
+    if type(dataset).__name__ == "Dataset":
+        return dataset.to_array()
+    else:
+        return dataset
+
+
+TRANSFORM_METHODS = {
+    "xarray.core.dataset.Dataset": lambda x: x.to_xarray(),
+    "xarray.core.dataarray.DataArray": lambda x: _to_dataarray(x.to_xarray()),
+    "numpy.ndarray": lambda x: x.to_numpy(),
+    "pandas.core.frame.DataFrame": lambda x: x.to_pandas(),
+}
+
+EMPTY_TYPES = [inspect._empty]
+DEFAULT_KWARG_TYPES = {
+    "dataarray": "xarray.core.dataarray.DataArray",
+    "dataset": "xarray.core.dataset.Dataset",
+    "data": "numpy.ndarray",
+}
 
 try:
     UNION_TYPES = [T.Union, types.UnionType]
 except AttributeError:
     # This sort of Union is not allowed in versions of python<3.9
-    UNION_TYPES = [
-        T.Union,
-    ]
+    UNION_TYPES = [T.Union]
 
-EMPTY_TYPES = [inspect._empty]
-DEFAULT_KWARG_TYPES = {
-    "dataarray": xr.DataArray,
-    "dataset": xr.Dataset,
-    "data": np.ndarray,
-}
+
+def stringify(obj_type):
+    """Convert a full class name and import path to a string."""
+    if not isinstance(obj_type, str):
+        obj_type = f"{obj_type.__module__}.{obj_type.__name__}"
+    return obj_type
 
 
 def ensure_iterable(input_item):
@@ -36,11 +54,22 @@ def ensure_iterable(input_item):
     return input_item
 
 
-def transform(obj, kwarg_type):
-    """Wrapper of emohawk.transform such that it also handles cads-toolbox Remote objects"""
-    if isinstance(obj, Remote):
-        obj = obj.data
-    return emohawk.transform(obj, kwarg_type)
+def transform(source, target_type):
+    if isinstance(source, Remote):
+        source = source.data
+    else:
+        try:
+            source = emohawk.load_from("file", source)
+        except TypeError:
+            # If we don't understand the input type, we should do nothing
+            print("KHJKSDAFGH")
+            return source
+    target_string = stringify(target_type)
+    if target_string in TRANSFORM_METHODS:
+        method = TRANSFORM_METHODS[target_string]
+    else:
+        raise TypeError(f"No transformation method found for {target_string}")
+    return method(source)
 
 
 def transform_function_inputs(function, **kwarg_types):
@@ -58,6 +87,7 @@ def transform_function_inputs(function, **kwarg_types):
             kwargs[name] = arg
         # transform kwargs if necessary
         for key, value in [(k, v) for k, v in kwargs.items() if k in mapping]:
+                        
             kwarg_types = ensure_iterable(mapping[key])
             # Transform value if necessary
             if type(value) not in kwarg_types:
@@ -108,12 +138,21 @@ def signature_mapping(signature, kwarg_types):
     return mapping
 
 
+def is_decorated(func):
+    return getattr(func, '_transform_applied', False)
+
+
 def transform_module_inputs(module, decorator=transform_function_inputs):
     """
     Transform the inputs to all functions in a module.
     """
     for name in dir(module):
         func = getattr(module, name)
+        if name.startswith("_") or is_decorated(func):
+            continue
         if isinstance(func, types.FunctionType):
+            func._transform_applied = True
             setattr(module, name, decorator(func))
     return module
+
+transform_module_inputs._transform_applied = True
